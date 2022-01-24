@@ -1,57 +1,43 @@
-const nodemailer = require("nodemailer");
+const formData = require("form-data");
+const Mailgun = require("mailgun.js");
+const { MAILGUN } = require("./../config");
+const mailgun = new Mailgun(formData);
 const CustomError = require("./../utils/custom-error");
-const { mailer, APP_NAME } = require("./../config");
 
 class MailService {
-  constructor(user) {
-    this.user = user;
+  constructor() {
+    this.mailClient = mailgun.client({ username: "api", key: MAILGUN.APIKEY });
+    this.from = MAILGUN.EMAIL;
   }
 
-  async send(subject, content, recipient, from) {
-    from = from || `${APP_NAME} <no-reply${mailer.DOMAIN}>`;
-    content = content || " ";
-
-    if (!recipient || recipient.length < 1)
-      throw new CustomError("Recipient is required");
-    if (!subject) throw new CustomError("Subject is required");
-
-    // Define nodemailer transporter
-    const transporter = nodemailer.createTransport({
-      host: mailer.HOST,
-      port: mailer.PORT,
-      secure: mailer.SECURE,
-      auth: {
-        user: mailer.USER,
-        pass: mailer.PASSWORD,
-      },
-    });
-
-    const result = await transporter.sendMail({
-      from,
-      to: Array.isArray(recipient) ? recipient.join() : recipient,
+  async send({ subject, content, to }) {
+    const data = {
       subject,
-      text: content,
-    });
+      html: content,
+      to: Array.isArray(to) ? to.join(",") : to,
+      from: this.from,
+    };
 
-    if (!result) throw new CustomError("Unable to send mail");
+    try {
+      // Invokes the method to send emails given the above data with the helper library
+      const response = await this.mailClient.messages.create(
+        MAILGUN.DOMAIN,
+        data
+      );
 
-    return result;
+      console.log(response);
+
+      return response;
+    } catch (error) {
+      throw new CustomError("Unable to send mail");
+    }
   }
 
-  async sendEmailVerificationMail(link) {
+  async sendEmailVerificationMail(otp, email) {
     const subject = "Email Verification";
-    const content = `Hey ${this.user.name}, Please click on the link to verify your email ${link}`;
-    const recipient = this.user.email;
+    const content = `<h1>Verify your mail</h1><p>Your one time passcode is ${otp}</p>`;
 
-    return await this.send(subject, content, recipient);
-  }
-
-  async sendPasswordResetMail(link) {
-    const subject = "Reset password";
-    const content = `Hey ${this.user.name}, Please click on the link to reset your password ${link}`;
-    const recipient = this.user.email;
-
-    return await this.send(subject, content, recipient);
+    return await this.send({ subject, content, to: email });
   }
 }
 
