@@ -1,7 +1,7 @@
 const Joi = require("@hapi/joi");
 
 const MintTokenPayloadSchema = Joi.object().keys({
-  name: Joi.string().required(),
+  otp: Joi.string().required(),
   email: Joi.string().email().required(),
 });
 

@@ -7,6 +7,8 @@ const usersSchema = new Schema(
     email: { type: String, required: true, unique: true },
     isVerified: { type: Boolean, default: false },
     isAvailable: { type: Boolean, default: true },
+    image: { type: String },
+    tokenURI: { type: String },
   },
   { timestamps: true }
 );
