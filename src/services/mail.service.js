@@ -6,7 +6,11 @@ const CustomError = require("./../utils/custom-error");
 
 class MailService {
   constructor() {
-    this.mailClient = mailgun.client({ username: "api", key: MAILGUN.APIKEY });
+    this.mailClient = mailgun.client({
+      username: "api",
+      key: MAILGUN.APIKEY,
+      url: "https://api.eu.mailgun.net",
+    });
     this.from = MAILGUN.EMAIL;
   }
 
@@ -25,8 +29,6 @@ class MailService {
         data
       );
 
-      console.log(response);
-
       return response;
     } catch (error) {
       throw new CustomError("Unable to send mail");
@@ -41,4 +43,4 @@ class MailService {
   }
 }
 
-module.exports = MailService;
+module.exports = new MailService();
