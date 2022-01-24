@@ -1,5 +1,7 @@
 require("express-async-errors");
+require("dotenv").config();
 const app = require("express")();
+const dbInit = require("./src/config/db.config");
 const { PORT } = process.env;
 
 // Pre-route middlewares
@@ -16,6 +18,8 @@ require("./src/middlewares/error.middleware")(app);
 
 // Listen to server port
 app.listen(PORT, async () => {
+  //Initialize Database
+  await dbInit();
   console.log(
     `:::> Server listening on port ${PORT} @ http://localhost:${PORT}`
   );
