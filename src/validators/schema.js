@@ -6,7 +6,10 @@ const MintTokenPayloadSchema = Joi.object().keys({
 });
 
 const RegisterUserSchema = Joi.object().keys({
-  name: Joi.string().required(),
+  name: Joi.string()
+    .trim()
+    .regex(/^(\w+\s\w+)*$/, "Name must contain first and last name")
+    .required(),
   email: Joi.string().email().required(),
   isAvailable: Joi.bool(),
 });
