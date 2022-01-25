@@ -6,6 +6,7 @@ const OtpModel = require("../models/otp.model");
 const fs = require("fs").promises;
 const path = require("path");
 const generateOtp = require("../utils/generateOtp");
+const generateQRCode = require("../utils/generateQRCode")
 const CustomError = require("../utils/custom-error");
 const capitalize = require("../utils/capitalize");
 
@@ -34,7 +35,8 @@ class Contoller {
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
-    await mailService.sendEmailVerificationMail(otp, user.email);
+    console.log(otp)
+    // await mailService.sendEmailVerificationMail(otp, user.email);
 
     return res.send(Response("User successfully registered"));
   }
@@ -61,9 +63,14 @@ class Contoller {
 
     const [firstName = "", lastName = ""] = user.name.split(" ");
 
+    const qrcode = await generateQRCode(
+      `name=${user.name}\nemail=${user.email}`
+    );
+
     svg = svg
       .replace("{{FIRST_NAME}}", capitalize(firstName))
-      .replace("{{LAST_NAME}}", capitalize(lastName));
+      .replace("{{LAST_NAME}}", capitalize(lastName))
+      .replace("{{QR_CODE}}", qrcode);
 
     const { url } = await UploadService.uploadImage(svg);
 
