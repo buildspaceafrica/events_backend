@@ -7,6 +7,7 @@ const fs = require("fs").promises;
 const path = require("path");
 const generateOtp = require("../utils/generateOtp");
 const CustomError = require("../utils/custom-error");
+const capitalize = require("../utils/capitalize");
 
 class Contoller {
   async registUser(req, res, next) {
@@ -56,7 +57,13 @@ class Contoller {
       throw new CustomError("User has minted before");
     }
 
-    const svg = await fs.readFile(path.join(__dirname, "test.svg"), "utf-8");
+    let svg = await fs.readFile(path.join(__dirname, "ticket.svg"), "utf-8");
+
+    const [firstName = "", lastName = ""] = user.name.split(" ");
+
+    svg = svg
+      .replace("{{FIRST_NAME}}", capitalize(firstName))
+      .replace("{{LAST_NAME}}", capitalize(lastName));
 
     const { url } = await UploadService.uploadImage(svg);
 
