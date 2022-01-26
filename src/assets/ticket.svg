@@ -339,7 +339,7 @@
           <path d="M263.9 320.7h-1.2v-1.1h1.2v1.1z" style="fill:url(#SVGID_51_)"/>
         </g>
       </g>
-      <text transform="translate(42.004 599.408)" class="st3 st10 st11">#1</text>
+      <text transform="translate(42.004 599.408)" class="st3 st10 st11">#{{TICKET_NUMBER}}</text>
       <g>
         <path class="st3" d="M42 467h100v100H42z"/>
         <image style="overflow:visible" width="800" height="800" xlink:href="{{QR_CODE}}" transform="translate(43.773 468.769) scale(.1206)"/>

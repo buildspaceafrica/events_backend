@@ -10,10 +10,13 @@ const provider = new HDWalletProvider({
 
 const web3 = new Web3(provider);
 
-const contract = new web3.eth.Contract(ContractABI.abi,config.CONTRACT_ADDRESS);
+const Contract = new web3.eth.Contract(ContractABI.abi,config.CONTRACT_ADDRESS);
 
-exports.isValidAddress = (address) => {
+const isValidAddress =  (address) => {
     return web3.utils.isAddress(address);
 }
 
-module.exports = contract;
+module.exports = {
+    isValidAddress,
+    Contract
+}
