@@ -20,7 +20,7 @@ class MailService {
 
   async send(messageParams) {
     const data = {
-     ...messageParams,
+      ...messageParams,
       from: this.from,
     };
 
@@ -44,27 +44,27 @@ class MailService {
     return await this.send({ subject, html, to: email });
   }
 
-  async sendNFTMintedMail({email, name, fileBuffer, nft}){
+  async sendNFTMintedMail({ email, name, fileBuffer, nft }) {
     let messageParams = {
       to: email,
       subject: "Event Ticket is Ready",
-      html: `<h1>Hey ${name}</h1><p>We are excited to have you at the buildspace event. Attached to the mail is your event ticket. View on ${nft.url}</p><p>Your token uri is ${nft.tokenURI}</p>`,
-      attachment: [{filename: `${name.split(' ').join('-')}-ticket.png`, data: fileBuffer}]
+      html: `<p>We are excited to have you at the 1st edition of buildspace Africa event</p><p><b>Venue:</b> Sunshine hotel, Enugu, Nigeria</p><p><b>Live stream:</b> <a href="https://streamyard.com/zvirqftye2">https://streamyard.com/zvirqftye2</a></p><p><b>Time:</b> 10:30am</a></p><p>Here is your unique Token URI for NFT - <a href="${nft.tokenURI}">${nft.tokenURI}</a></p><p><b>Note:</b> You'll will only be allowed into the physical venue if you minted the physical NFT</p>`,
+      attachment: [{ filename: `${name.split(' ').join('-')}-ticket.png`, data: fileBuffer }]
+    }
+
+    return await this.send(messageParams)
   }
 
-  return  await this.send(messageParams)
-  }
-
-  async sendEventDetailsMail(email){
+  async sendEventDetailsMail(email) {
     const file = await fs.readFile(path.resolve('./src/assets/eventBanner.jpg'))
     let messageParams = {
       to: email,
       subject: 'Getting ready for the event?',
       html: `<h1>Let's Talk Web3</h1><p>Join us on Saturday, January 29 on the buildspace event livestream: <a href="www.buildspace.africa">www.events.buildspace.africa</a></p><p>Check email attachment for more details on the event</p>`,
-      attachment: [{filename: 'buildspace-africa-event.jpg', data: file }]
+      attachment: [{ filename: 'buildspace-africa-event.jpg', data: file }]
     }
 
-    return  await this.send(messageParams);
+    return await this.send(messageParams);
   }
 }
 

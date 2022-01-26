@@ -22,13 +22,6 @@ class Contoller {
       user = await UserModel.create(req.body);
     }
 
-    const {isAvailable = true} = req.body;
-
-    if(!isAvailable){
-      await mailService.sendEventDetailsMail(user.email);
-      return res.send(Response("Check mail for event details"));
-    }
-
     const otp = generateOtp();
 
     // update user otp or create a new document if it dosen't exist
