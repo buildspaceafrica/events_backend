@@ -1,8 +1,8 @@
-const winston = require('winston');
+const winston = require("winston");
 
 const options = {
   error: {
-    level: 'error',
+    level: "error",
     filename: `logs/error.log`,
     json: true,
     maxsize: 5242880, // 5MB
@@ -16,31 +16,31 @@ const logger = winston.createLogger({
     new winston.transports.File(options.error),
   ],
   exceptionHandlers: [
-    new winston.transports.File({ filename: 'logs/exceptions.log' }),
-    new winston.transports.Console({ format: winston.format.simple(), })
-  ]
+    new winston.transports.File({ filename: "logs/exceptions.log" }),
+  ],
 });
 
 //
 // If we're not in production then log to the `console` with the format:
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   const formatter = winston.format.combine(
     winston.format.colorize(),
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
     winston.format.splat(),
     winston.format.printf((info) => {
       const { timestamp, level, message, ...meta } = info;
 
-      return `${timestamp} [${level}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ''
-        }`;
-    }),
+      return `${timestamp} [${level}]: ${message} ${
+        Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ""
+      }`;
+    })
   );
 
-
-  logger.add(new winston.transports.Console({
-    format: formatter,
-  }));
-
+  logger.add(
+    new winston.transports.Console({
+      format: formatter,
+    })
+  );
 }
 
 module.exports = logger;
