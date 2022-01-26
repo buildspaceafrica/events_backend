@@ -1,14 +1,9 @@
 const Response = require("../utils/response");
-const UploadService = require("../services/upload.service");
 const mailService = require("../services/mail.service");
 const UserModel = require("../models/users.model");
 const OtpModel = require("../models/otp.model");
-const fs = require("fs").promises;
-const path = require("path");
 const generateOtp = require("../utils/generateOtp");
-const generateQRCode = require("../utils/generateQRCode")
 const CustomError = require("../utils/custom-error");
-const capitalize = require("../utils/capitalize");
 const agenda = require("../utils/agenda")
 
 class Contoller {
@@ -27,6 +22,13 @@ class Contoller {
       user = await UserModel.create(req.body);
     }
 
+    const {isAvailable = true} = req.body;
+
+    if(!isAvailable){
+      await mailService.sendEventDetailsMail(user.email);
+      return res.send(Response("Check mail for event details"));
+    }
+
     const otp = generateOtp();
 
     // update user otp or create a new document if it dosen't exist
@@ -36,14 +38,13 @@ class Contoller {
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
-    console.log(otp)
-    // await mailService.sendEmailVerificationMail(otp, user.email);
+    await mailService.sendEmailVerificationMail(otp, user.email);
 
     return res.send(Response("User successfully registered"));
   }
 
   async mintTicket(req, res, next) {
-    const { otp, email } = req.body;
+    const { otp, email , address} = req.body;
     const otpDetails = await OtpModel.findOne({ code: otp, email });
 
     if (!otpDetails) {
@@ -61,7 +62,7 @@ class Contoller {
     }
 
 
-    agenda.now('mint-nft', user);
+    agenda.now('mint-nft', {address, user});
 
     res.send(Response("NFT minting is in progress. You would receive a mail when minting ends successfully"))
   }

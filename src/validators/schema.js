@@ -4,10 +4,10 @@ const {isValidAddress} = require("../utils/contract")
 const MintTokenPayloadSchema = Joi.object().keys({
   otp: Joi.string().required(),
   email: Joi.string().email().required(),
-  // address: Joi.string().custom((value, helper) => {
-  //   if(!isValidAddress(value)) return helper.error('any.invalid');
-  //   return true;
-  // })
+  address: Joi.string().required().custom((value, helper) => {
+    if(!isValidAddress(value)) return helper.error('any.invalid');
+    return true;
+  })
 });
 
 const RegisterUserSchema = Joi.object().keys({

@@ -1,8 +1,11 @@
 const formData = require("form-data");
 const Mailgun = require("mailgun.js");
+const path = require("path");
+const fs = require('fs').promises;
 const { MAILGUN } = require("./../config");
 const mailgun = new Mailgun(formData);
 const CustomError = require("./../utils/custom-error");
+
 
 class MailService {
   constructor() {
@@ -49,6 +52,18 @@ class MailService {
   }
 
   return  await this.send(messageParams)
+  }
+
+  async sendEventDetailsMail(email){
+    const file = await fs.readFile(path.resolve('./src/assets/eventBanner.jpg'))
+    let messageParams = {
+      to: email,
+      subject: 'Getting ready for the event?',
+      html: `<h1>Let's Talk Web3</h1><p>Join us on Saturday, January 29 on the buildspace event livestream: <a href="www.buildspace.africa">www.events.buildspace.africa</a></p><p>Check email attachment for more details on the event</p>`,
+      attachment: [{filename: 'buildspace-africa-event.jpg', data: file }]
+    }
+
+    return  await this.send(messageParams);
   }
 }
 
