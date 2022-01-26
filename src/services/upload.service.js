@@ -14,7 +14,7 @@ class UploadService {
         }
       );
 
-      sharp(Buffer.from(svgString)).resize({height: 1280}).png({quality: 100}).pipe(cloudinaryStreamUpload);
+      sharp(Buffer.from(svgString)).pipe(cloudinaryStreamUpload);
     });
   }
 
