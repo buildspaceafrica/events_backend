@@ -9,6 +9,7 @@ const generateOtp = require("../utils/generateOtp");
 const generateQRCode = require("../utils/generateQRCode")
 const CustomError = require("../utils/custom-error");
 const capitalize = require("../utils/capitalize");
+const agenda = require("../utils/agenda")
 
 class Contoller {
   async registUser(req, res, next) {
@@ -59,41 +60,10 @@ class Contoller {
       throw new CustomError("User has minted before");
     }
 
-    let svg = await fs.readFile(path.join(__dirname, "ticket.svg"), "utf-8");
 
-    const [firstName = "", lastName = ""] = user.name.split(" ");
+    agenda.now('mint-nft', user);
 
-    const qrcode = await generateQRCode(
-      `name=${user.name}\nemail=${user.email}`
-    );
-
-    svg = svg
-      .replace("{{FIRST_NAME}}", capitalize(firstName))
-      .replace("{{LAST_NAME}}", capitalize(lastName))
-      .replace("{{QR_CODE}}", qrcode);
-
-    const { url } = await UploadService.uploadImage(svg);
-
-    const metadata = {
-      image: url,
-      name: user.name,
-      description: `${user.name} event ticket`,
-      attributes: {
-        email,
-      },
-    };
-
-    const tokenURI = await UploadService.uploadMetadataToIPFS(metadata);
-
-    // update user verification status after svg generation is completed
-    await UserModel.findOneAndUpdate(
-      { email },
-      { isVerified: true, tokenURI, image: url }
-    );
-
-    return res.send(
-      Response("Token successfully minted", { imageUrl: url, tokenURI })
-    );
+    res.send(Response("NFT minting is in progress. You would receive a mail when minting ends successfully"))
   }
 }
 
