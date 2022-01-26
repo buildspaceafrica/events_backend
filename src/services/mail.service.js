@@ -5,6 +5,7 @@ const fs = require('fs').promises;
 const { MAILGUN } = require("./../config");
 const mailgun = new Mailgun(formData);
 const CustomError = require("./../utils/custom-error");
+const logger = require("../utils/logger")
 
 
 class MailService {
@@ -32,15 +33,15 @@ class MailService {
 
       return response;
     } catch (error) {
-      throw new CustomError("Unable to send mail");
+      throw error;
     }
   }
 
   async sendEmailVerificationMail(otp, email) {
     const subject = "Email Verification";
-    const content = `<h1>Verify your mail</h1><p>Your one time passcode is ${otp}</p>`;
+    const html = `<h1>Verify your mail</h1><p>Your one time passcode is ${otp}</p>`;
 
-    return await this.send({ subject, content, to: email });
+    return await this.send({ subject, html, to: email });
   }
 
   async sendNFTMintedMail({email, name, fileBuffer, nft}){

@@ -10,6 +10,7 @@ module.exports = (app) => {
      });
 
      app.use((error, req, res, next) => {
+          logger.error(error)
           if (error.name == "CustomError") {
                res.status(error.status).send(response(error.message, null, false));
           }
@@ -22,7 +23,6 @@ module.exports = (app) => {
                res.status(400).send(response(error.message, null, false));
           }
           else {
-               logger.error(error);
                res.status(500).send(response(error.message, null, false));
           }
      });
