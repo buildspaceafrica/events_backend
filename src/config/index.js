@@ -1,3 +1,5 @@
+require("dotenv").config()
+
 const env = process.env.NODE_ENV || "development";
 
 //common environmental variables in all environments
@@ -9,6 +11,10 @@ const common = {
     DOMAIN: process.env.MAILGUN_DOMAIN,
     EMAIL: process.env.MAILGUN_CUSTOM_EMAIL,
   },
+  CONTRACT_ADDRESS: process.env.CONTRACT_ADDRESS,
+  SIGNING_ADDRESS: process.env.SIGNING_ADDRESS,
+  CONTRACT_PRIVATE_KEY: process.env.CONTRACT_PRIVATE_KEY,
+  PROVIDER_URL: process.env.PROVIDER_URL
 };
 
 const development = {

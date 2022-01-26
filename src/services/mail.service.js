@@ -1,8 +1,11 @@
 const formData = require("form-data");
 const Mailgun = require("mailgun.js");
+const path = require("path");
+const fs = require('fs').promises;
 const { MAILGUN } = require("./../config");
 const mailgun = new Mailgun(formData);
 const CustomError = require("./../utils/custom-error");
+
 
 class MailService {
   constructor() {
@@ -14,11 +17,9 @@ class MailService {
     this.from = MAILGUN.EMAIL;
   }
 
-  async send({ subject, content, to }) {
+  async send(messageParams) {
     const data = {
-      subject,
-      html: content,
-      to: Array.isArray(to) ? to.join(",") : to,
+     ...messageParams,
       from: this.from,
     };
 
@@ -40,6 +41,29 @@ class MailService {
     const content = `<h1>Verify your mail</h1><p>Your one time passcode is ${otp}</p>`;
 
     return await this.send({ subject, content, to: email });
+  }
+
+  async sendNFTMintedMail({email, name, fileBuffer, nft}){
+    let messageParams = {
+      to: email,
+      subject: "Event Ticket is Ready",
+      html: `<h1>Hey ${name}</h1><p>We are excited to have you at the buildspace event. Attached to the mail is your event ticket. View on ${nft.url}</p><p>Your token uri is ${nft.tokenURI}</p>`,
+      attachment: [{filename: `${name.split(' ').join('-')}-ticket.png`, data: fileBuffer}]
+  }
+
+  return  await this.send(messageParams)
+  }
+
+  async sendEventDetailsMail(email){
+    const file = await fs.readFile(path.resolve('./src/assets/eventBanner.jpg'))
+    let messageParams = {
+      to: email,
+      subject: 'Getting ready for the event?',
+      html: `<h1>Let's Talk Web3</h1><p>Join us on Saturday, January 29 on the buildspace event livestream: <a href="www.buildspace.africa">www.events.buildspace.africa</a></p><p>Check email attachment for more details on the event</p>`,
+      attachment: [{filename: 'buildspace-africa-event.jpg', data: file }]
+    }
+
+    return  await this.send(messageParams);
   }
 }
 
