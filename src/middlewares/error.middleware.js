@@ -1,3 +1,4 @@
+const logger = require("../utils/logger");
 const response = require("./../utils/response")
 
 // Possible error names
@@ -21,6 +22,7 @@ module.exports = (app) => {
                res.status(400).send(response(error.message, null, false));
           }
           else {
+               logger.error(error);
                res.status(500).send(response(error.message, null, false));
           }
      });
