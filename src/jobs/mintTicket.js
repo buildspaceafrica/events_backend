@@ -7,12 +7,12 @@ const Contract = require("../utils/contract");
 const MailService = require("../services/mail.service")
 const generateQRCode = require("../utils/generateQRCode");
 const capitalize = require("../utils/capitalize");
+const sharp = require("sharp")
 
 
 module.exports = function (agenda){
     agenda.define("mint-nft", async (job) => {
         try {
-            console.log("STARTED MINTING NFT", job)
         const userInfo = job.attrs.data;
 
         const {name, email} = userInfo;
@@ -43,13 +43,19 @@ module.exports = function (agenda){
     
         const tokenURI = await UploadService.uploadMetadataToIPFS(metadata);
     
+        
+
+        const fileBuffer = await sharp(Buffer.from(svg)).png();
+
+        MailService.sendNFTMintedMail({email, name, fileBuffer, nft: {url, tokenURI}})
+
         // update user verification status after svg generation is completed
         await UserModel.findOneAndUpdate(
-          { email },
-          { isVerified: true, tokenURI, image: url }
-        );
+            { email },
+            { isVerified: true, tokenURI, image: url }
+          );
 
-        console.log("COMPLETED JOB", {email, url, tokenURI})
+       
         } catch (error) {
             console.log({error})
         }
