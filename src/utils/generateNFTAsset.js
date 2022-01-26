@@ -1,30 +1,29 @@
-
-const generateQRCode = require('./generateQRCode');
+const generateQRCode = require("./generateQRCode");
 const fs = require("fs").promises;
 const capitalize = require("./capitalize");
-const path = require("path")
-
+const path = require("path");
 
 async function generateNFTAsset({ user, ticketNumber }) {
-    const { name, email, isAvailable } = user;
+  const { name, email, isAvailable } = user;
 
-    let svg = await fs.readFile(path.resolve('./src/assets/ticket.svg'), "utf-8");
+  const filename = isAvailable ? "physical-ticket" : "virtual-ticket";
 
-    const qrcode = await generateQRCode(
-        `name=${name}\nemail=${email}`
-    );
+  let svg = await fs.readFile(
+    path.resolve(`./src/assets/${filename}.svg`),
+    "utf-8"
+  );
 
-    const [firstName = '', lastName = ''] = name.split(' ');
+  const qrcode = await generateQRCode(`name=${name}\nemail=${email}`);
 
-    svg = svg
-        .replace("{{FIRST_NAME}}", capitalize(firstName))
-        .replace("{{LAST_NAME}}", capitalize(lastName))
-        .replace("{{QR_CODE}}", qrcode)
-        .replace("{{TICKET_NUMBER}}", ticketNumber).replace('{{PHYSICAL}}', isAvailable ? 'Physical' : 'Virtual')
+  const [firstName = "", lastName = ""] = name.split(" ");
 
-    return svg;
+  svg = svg
+    .replace("{{FIRST_NAME}}", capitalize(firstName))
+    .replace("{{LAST_NAME}}", capitalize(lastName))
+    .replace("{{QR_CODE}}", qrcode)
+    .replace("{{TICKET_NUMBER}}", ticketNumber);
+
+  return svg;
 }
-
-
 
 module.exports = generateNFTAsset;

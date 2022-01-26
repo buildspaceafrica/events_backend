@@ -1,4 +1,3 @@
-
 const UploadService = require("../services/upload.service");
 const UserModel = require("../models/users.model");
 const { Contract } = require("../utils/contract");
@@ -6,12 +5,12 @@ const MailService = require("../services/mail.service");
 const sharp = require("sharp");
 const config = require("../config");
 const generateNFTAsset = require("../utils/generateNFTAsset");
-const logger = require("../utils/logger")
+const logger = require("../utils/logger");
 
 module.exports = function (agenda) {
   agenda.define("mint-nft", async (job) => {
     try {
-      logger.info("Starting minting", { job })
+      logger.info("Starting minting");
       const { user, address } = job.attrs.data;
 
       const userInfo = await UserModel.findOne({ email: user.email });
@@ -25,7 +24,10 @@ module.exports = function (agenda) {
 
       const totalSupply = await Contract.methods.totalSupply().call();
 
-      const svg = await generateNFTAsset({ user: userInfo, ticketNumber: Number(totalSupply) + 1 });
+      const svg = await generateNFTAsset({
+        user: userInfo,
+        ticketNumber: Number(totalSupply) + 1,
+      });
 
       const { url } = await UploadService.uploadImage(svg);
 
@@ -62,6 +64,6 @@ module.exports = function (agenda) {
       logger.error("MINTING FAILED", error);
     }
 
-    logger.info("MINTING ENDED")
+    logger.info("MINTING ENDED");
   });
 };
