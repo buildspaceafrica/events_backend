@@ -9,62 +9,58 @@ const logger = require("../utils/logger");
 
 module.exports = function (agenda) {
   agenda.define("mint-nft", async (job) => {
-    try {
-      logger.info("Starting minting");
-      const { user, address } = job.attrs.data;
+    logger.info("Starting minting");
+    const { user, address } = job.attrs.data;
 
-      const userInfo = await UserModel.findOne({ email: user.email });
+    const userInfo = await UserModel.findOne({ email: user.email });
 
-      if (!userInfo) return;
+    if (!userInfo) return;
 
-      const { name, email, isAvailable, isVerified } = userInfo;
+    const { name, email, isAvailable, isVerified } = userInfo;
 
-      // if user has minted nft before
-      if (isVerified) return;
+    // if user has minted nft before
+    if (isVerified) return;
 
-      const totalSupply = await Contract.methods.totalSupply().call();
+    const totalSupply = await Contract.methods.totalSupply().call();
 
-      const svg = await generateNFTAsset({
-        user: userInfo,
-        ticketNumber: Number(totalSupply) + 1,
-      });
+    const svg = await generateNFTAsset({
+      user: userInfo,
+      ticketNumber: Number(totalSupply) + 1,
+    });
 
-      const { url } = await UploadService.uploadImage(svg);
+    const { url } = await UploadService.uploadImage(svg);
 
-      const metadata = {
-        image: url,
-        name,
-        description: `${name} event ticket`,
-        attributes: [
-          {
-            "attendee-type": isAvailable ? "physical" : "virtual",
-          },
-        ],
-      };
+    const metadata = {
+      image: url,
+      name,
+      description: `${name} event ticket`,
+      attributes: [
+        {
+          "attendee-type": isAvailable ? "physical" : "virtual",
+        },
+      ],
+    };
 
-      const tokenURI = await UploadService.uploadMetadataToIPFS(metadata);
+    const tokenURI = await UploadService.uploadMetadataToIPFS(metadata);
 
-      await Contract.methods
-        .mint(address, tokenURI, isAvailable)
-        .send({ from: config.SIGNING_ADDRESS });
+    await Contract.methods
+      .mint(address, tokenURI, isAvailable)
+      .send({ from: config.SIGNING_ADDRESS });
 
-      const fileBuffer = await sharp(Buffer.from(svg)).png();
+    const fileBuffer = await sharp(Buffer.from(svg)).png();
 
-      await MailService.sendNFTMintedMail({
-        email,
-        name,
-        fileBuffer,
-        nft: { url, tokenURI },
-      });
+    await MailService.sendNFTMintedMail({
+      email,
+      name,
+      fileBuffer,
+      nft: { url, tokenURI },
+    });
 
-      // update user verification status after svg generation is completed
-      await UserModel.findOneAndUpdate(
-        { email },
-        { isVerified: true, tokenURI, image: url }
-      );
-    } catch (error) {
-      logger.error("MINTING FAILED", error);
-    }
+    // update user verification status after svg generation is completed
+    await UserModel.findOneAndUpdate(
+      { email },
+      { isVerified: true, tokenURI, image: url }
+    );
 
     logger.info("MINTING ENDED");
   });
