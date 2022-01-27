@@ -4,7 +4,7 @@ require("../jobs/mintTicket")(agenda);
 
 agenda.on("ready", async () => {
   await agenda.start();
-  await agenda.cancel({ nextRunAt: null });
+  await agenda.cancel({ nextRunAt: null, failedAt: { $exists: false } });
 });
 
 let graceful = () => {
