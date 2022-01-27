@@ -35,9 +35,11 @@ module.exports = function (agenda) {
         image: url,
         name,
         description: `${name} event ticket`,
-        attributes: {
-          email,
-        },
+        attributes: [
+          {
+            "attendee-type": isAvailable ? "physical" : "virtual",
+          },
+        ],
       };
 
       const tokenURI = await UploadService.uploadMetadataToIPFS(metadata);
