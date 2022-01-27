@@ -48,7 +48,7 @@ class MailService {
     let messageParams = {
       to: email,
       subject: "Event Ticket is Ready",
-      html: `<p>We are excited to have you at the 1st edition of buildspace Africa event</p><p><b>Venue:</b> Sunshine hotel, Enugu, Nigeria</p><p><b>Live stream:</b> <a href="https://streamyard.com/zvirqftye2">https://streamyard.com/zvirqftye2</a></p><p><b>Time:</b> 10:30am</a></p><p>Here is your unique Token URI for NFT - <a href="${nft.tokenURI}">${nft.tokenURI}</a></p><p><b>Note:</b> You'll will only be allowed into the physical venue if you minted the physical NFT</p>`,
+      html: `<p>We are excited to have you at the 1st edition of buildspace Africa event</p><p><b>Venue:</b> Sunshine hotel, Enugu, Nigeria</p><p><b>Live stream:</b> Would be posted before the event</p><p><b>Time:</b> 10:30am</a></p><p>Here is your unique Token URI for NFT - <a href="${nft.tokenURI}">${nft.tokenURI}</a></p><p><b>Note:</b> You'll will only be allowed into the physical venue if you minted the physical NFT</p>`,
       attachment: [
         {
           filename: `${name.split(" ").join("-")}-ticket.png`,
