@@ -4,10 +4,15 @@ const UserModel = require("../models/users.model");
 const OtpModel = require("../models/otp.model");
 const generateOtp = require("../utils/generateOtp");
 const CustomError = require("../utils/custom-error");
-const agenda = require("../utils/agenda")
+const agenda = require("../utils/agenda");
+const config = require("../config");
 
 class Contoller {
   async registUser(req, res, next) {
+    if (config.STOP_PHYSICAL_MINTING && req.body?.isAvailable) {
+      throw new CustomError("Physical minting has ended");
+    }
+
     const exists = await UserModel.findOne({ email: req.body.email });
     let user;
 
@@ -37,7 +42,7 @@ class Contoller {
   }
 
   async mintTicket(req, res, next) {
-    const { otp, email , address} = req.body;
+    const { otp, email, address } = req.body;
     const otpDetails = await OtpModel.findOne({ code: otp, email });
 
     if (!otpDetails) {
@@ -54,10 +59,13 @@ class Contoller {
       throw new CustomError("User has minted before");
     }
 
+    agenda.now("mint-nft", { address, user });
 
-    agenda.now('mint-nft', {address, user});
-
-    res.send(Response("NFT minting is in progress. You would receive a mail when minting ends successfully"))
+    res.send(
+      Response(
+        "NFT minting is in progress. You would receive a mail when minting ends successfully"
+      )
+    );
   }
 }
 
