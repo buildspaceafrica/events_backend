@@ -1,4 +1,4 @@
-require("dotenv").config()
+require("dotenv").config();
 
 const env = process.env.NODE_ENV || "development";
 
@@ -14,7 +14,8 @@ const common = {
   CONTRACT_ADDRESS: process.env.CONTRACT_ADDRESS,
   SIGNING_ADDRESS: process.env.SIGNING_ADDRESS,
   CONTRACT_PRIVATE_KEY: process.env.CONTRACT_PRIVATE_KEY,
-  PROVIDER_URL: process.env.PROVIDER_URL
+  PROVIDER_URL: process.env.PROVIDER_URL,
+  STOP_PHYSICAL_MINTING: process.env.STOP_PHYSICAL_MINTING,
 };
 
 const development = {

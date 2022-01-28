@@ -12,7 +12,7 @@ module.exports = function (agenda) {
     logger.info("Starting minting");
     const { user, address } = job.attrs.data;
 
-    const userInfo = await UserModel.findOne({ email: user.email });
+    let userInfo = await UserModel.findOne({ email: user.email }).lean();
 
     if (!userInfo) return;
 
@@ -24,11 +24,19 @@ module.exports = function (agenda) {
     const totalSupply = await Contract.methods.totalSupply().call();
 
     const svg = await generateNFTAsset({
-      user: userInfo,
+      user: {
+        ...userInfo,
+        isAvailable: config.STOP_PHYSICAL_MINTING
+          ? false
+          : userInfo.isAvailable,
+      },
       ticketNumber: Number(totalSupply) + 1,
     });
 
     const { url } = await UploadService.uploadImage(svg);
+
+    const attendeeType =
+      config.STOP_PHYSICAL_MINTING || !isAvailable ? "virtual" : "physical";
 
     const metadata = {
       image: url,
@@ -36,7 +44,7 @@ module.exports = function (agenda) {
       description: `${name} event ticket`,
       attributes: [
         {
-          "attendee-type": isAvailable ? "physical" : "virtual",
+          "attendee-type": attendeeType,
         },
       ],
     };
@@ -44,7 +52,7 @@ module.exports = function (agenda) {
     const tokenURI = await UploadService.uploadMetadataToIPFS(metadata);
 
     await Contract.methods
-      .mint(address, tokenURI, isAvailable)
+      .mint(address, tokenURI, config.STOP_PHYSICAL_MINTING || isAvailable)
       .send({ from: config.SIGNING_ADDRESS });
 
     const fileBuffer = await sharp(Buffer.from(svg)).png();
